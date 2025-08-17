@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  mcp-server:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - KONNECT_ACCESS_TOKEN=kpat_api_key_here
+      - KONNECT_REGION=eu
+      - AUTH_TOKEN=your_secure_token
+    volumes:
+      - /etc/ssl:/etc/ssl:ro

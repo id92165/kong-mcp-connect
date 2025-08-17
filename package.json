@@ -1,0 +1,33 @@
+{
+  "name": "kong-konnect-mcp",
+  "version": "1.0.0",
+  "description": "Kong Konnect MCP Server",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "kong",
+    "konnect",
+    "api",
+    "gateway"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "axios": "^1.6.2",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0", 
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
