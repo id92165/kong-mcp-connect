@@ -184,15 +184,28 @@ class KongKonnectMcpServer extends McpServer {
     });
   }
 
-  public startHttpServer() {
-    const app = express();
-    this.registerMiddleware(app);
+public startHttpServer() {
+  const app = express();
+  this.registerMiddleware(app);
 
-    const port = process.env.PORT || 8080;
-    app.listen(port, () => {
-      console.log(`HTTP server running on port ${port}`);
+  // SSE endpoint
+  app.get("/events", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    res.write("data: Connected to SSE\n\n");
+
+    req.on("close", () => {
+      console.log("SSE connection closed");
     });
-  }
+  });
+
+  const port = process.env.PORT || 8080;
+  app.listen(port, () => {
+    console.log(`HTTP server running on port ${port}`);
+  });
+}
 }
 
 /**
@@ -208,6 +221,9 @@ async function main() {
     apiKey,
     apiRegion
   });
+
+  // Start HTTP server
+  server.startHttpServer();
 
   // Create transport and connect
   const transport = new StdioServerTransport();

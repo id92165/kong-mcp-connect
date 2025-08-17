@@ -16,5 +16,4 @@ ENV KONNECT_REGION=us
 
 EXPOSE 8080
 
-
-CMD ["node", "build/index.js"]
+CMD ["npm", "start"]
