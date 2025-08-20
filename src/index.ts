@@ -6,7 +6,6 @@ import { KongApi, API_REGIONS } from "./api.js";
 import * as analytics from "./operations/analytics.js";
 import * as configuration from "./operations/configuration.js";
 import * as controlPlanes from "./operations/controlPlanes.js";
-import express from "express";
 
 /**
  * Main MCP server class for Kong Konnect integration
@@ -172,40 +171,6 @@ class KongKonnectMcpServer extends McpServer {
       );
     });
   }
-
-  private registerMiddleware(app: express.Application) {
-    // Middleware
-    app.use((req, res, next) => {
-      const token = req.headers["authorization"];
-      if (token !== `Bearer ${process.env.AUTH_TOKEN}`) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-      next();
-    });
-  }
-
-public startHttpServer() {
-  const app = express();
-  this.registerMiddleware(app);
-
-  // SSE endpoint
-  app.get("/events", (req, res) => {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    res.write("data: Connected to SSE\n\n");
-
-    req.on("close", () => {
-      console.log("SSE connection closed");
-    });
-  });
-
-  const port = process.env.PORT || 8080;
-  app.listen(port, () => {
-    console.log(`HTTP server running on port ${port}`);
-  });
-}
 }
 
 /**
@@ -221,9 +186,6 @@ async function main() {
     apiKey,
     apiRegion
   });
-
-  // Start HTTP server
-  server.startHttpServer();
 
   // Create transport and connect
   const transport = new StdioServerTransport();

@@ -1,19 +1,23 @@
-FROM node:20-alpine
-
+FROM node:20 AS builder
 WORKDIR /app
-
-
+COPY package*.json ./
+RUN npm ci
 COPY . .
-COPY package.json package-lock.json ./
-
-RUN npm install
 RUN npm run build
 
-ENV NODE_ENV=production
-ENV KONNECT_ACCESS_TOKEN=kpat_api_key_here
-ENV KONNECT_REGION=us
+FROM node:20-slim AS final
+WORKDIR /app
 
+# Copy and install certificate
+COPY zscal.crt /usr/local/share/ca-certificates/zscal.crt
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    chmod 644 /usr/local/share/ca-certificates/zscal.crt && \
+    update-ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-EXPOSE 8080
-
-CMD ["npm", "start"]
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/build ./build
+CMD ["node", "build/index.js"] 
